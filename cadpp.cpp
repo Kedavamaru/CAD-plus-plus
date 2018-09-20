@@ -36,23 +36,23 @@ namespace cadpp {
 #define w(c, v) file << c << "\n" << v << "\n";
 				w(0, "SECTION")
 					w(2, "HEADER")
-					w(9, "$ACADVER")
-					w(1, header.acadver)
-					w(9, "$INSBASE")
-					w(10, header.insbase.x)
-					w(20, header.insbase.y)
-					w(30, header.insbase.z)
-					w(0, "ENDSEC")
+						w(9, "$ACADVER")
+							w(1, header.acadver)
+						w(9, "$INSBASE")
+							w(10, header.insbase.x)
+							w(20, header.insbase.y)
+							w(30, header.insbase.z)
+				w(0, "ENDSEC")
 
-					w(0, "SECTION")
+				w(0, "SECTION")
 					w(2, "TABLES")
-					w(0, "ENDSEC")
+				w(0, "ENDSEC")
 
-					w(0, "SECTION")
+				w(0, "SECTION")
 					w(2, "BLOCKS")
-					w(0, "ENDSEC")
+				w(0, "ENDSEC")
 
-					w(0, "SECTION")
+				w(0, "SECTION")
 					w(2, "ENTITIES")
 					for (unsigned int i = 0; i < entities.points.size(); ++i) {
 						w(0, "POINT")
@@ -62,26 +62,27 @@ namespace cadpp {
 							w(30, entities.points[i].z)
 					}
 
-				for (unsigned int i = 0; i < entities.lines.size(); ++i) {
-					w(0, "LINE")
-						w(8, entities.lines[i].layer)
-						w(10, entities.lines[i].thickness)
-						w(10, entities.lines[i].colorindex)
-						w(10, entities.lines[i].x1)
-						w(20, entities.lines[i].y1)
-						w(30, entities.lines[i].z1)
-						w(30, entities.lines[i].x2)
-						w(30, entities.lines[i].y2)
-						w(30, entities.lines[i].z2)
-				}
+					for (unsigned int i = 0; i < entities.lines.size(); ++i) {
+						w(0, "LINE")
+							w(8, entities.lines[i].layer)
+							w(10, entities.lines[i].thickness)
+							w(10, entities.lines[i].colorindex)
+							w(10, entities.lines[i].x1)
+							w(20, entities.lines[i].y1)
+							w(30, entities.lines[i].z1)
+							w(30, entities.lines[i].x2)
+							w(30, entities.lines[i].y2)
+							w(30, entities.lines[i].z2)
+					}
 				w(0, "ENDSEC")
 
-					w(0, "EOF")
+				w(0, "EOF")
 #undef w
-					file.close();
+				file.close();
 				return file.good();
 			}
 			bool cad::open(const string &filename) {
+				// Not yet implemented
 				return false;
 			}
 		}

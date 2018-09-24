@@ -26,86 +26,148 @@
 #include <string>
 #include <vector>
 
-namespace cadpp {
-	using namespace std;
+namespace cadpp
+{
+	namespace dxf
+	{
+		namespace r12
+		{
+			using std::string;
+			using std::vector;
+			using std::ofstream;
 
-	namespace dxf {
-		namespace r12 {
 			using num = long;
 			using dbl = double;
 			using str = string;
 
-			class cad {
+			// AutoCAD Index Colors (ACI)
+			constexpr num color_red      =   1;
+			constexpr num color_yellow   =   2;
+			constexpr num color_green    =   3;
+			constexpr num color_cyan     =   4;
+			constexpr num color_blue     =   5;
+			constexpr num color_pink     =   6;
+			constexpr num color_default  =   7;
+				// index 7 = black @ background_color white
+				// index 7 = white @ background_color black
+			constexpr num color_by_block =   0;
+			constexpr num color_by_layer = 256;
+
+			class cad
+			{
 			public:
-				class header {
+				class header
+				{
 				public:
-					const str acadver = "AC1009";
-					struct insbase {
-						dbl x = 0.0;
-						dbl y = 0.0;
-						dbl z = 0.0;
-					} insbase;
-				} header;
-				class tables {
-				public:
-				} tables;
-				class blocks {
-				public:
-				} blocks;
-				class entities {
-				public:
-					struct point {
-						str layer = "0";
+					class insbase
+					{
+					public:
 						dbl x = 0.0;
 						dbl y = 0.0;
 						dbl z = 0.0;
 					};
-					struct line {
-						str layer = "0";
-						dbl thickness = 0;
-						num colorindex = 0;
+					class extmin
+					{
+					public:
+						dbl x = 0.0;
+						dbl y = 0.0;
+						dbl z = 0.0;
+					};
+					class extmax
+					{
+					public:
+						dbl x = 0.0;
+						dbl y = 0.0;
+						dbl z = 0.0;
+					};
 
+					insbase insbase;
+					extmin extmin;
+					extmax extmax;
+				};
+				class tables
+				{
+				public:
+					class ltype
+					{
+					public:
+						str name = "continuous";
+						str description = "";
+						num flags = 0;
+						vector<dbl> dash_lengths;
+
+						dbl total_dash_lengths() {
+							dbl sum = 0;
+							for (auto val : dash_lengths) sum += (val > 0)? val : -1.0 * val;
+							return sum;
+						}
+					};
+					class layer
+					{
+					public:
+						str name = "default";
+						num flags = 0;
+						num color = color_default;
+						str ltype = "continuous";
+					};
+					class style
+					{
+					public:
+					};
+
+					vector<style> styles;
+					vector<ltype> ltypes = { ltype() };
+					vector<layer> layers = { layer() };
+				};
+				class blocks
+				{
+				public:
+				};
+				class entities
+				{
+				public:
+					class point
+					{
+					public:
+						str layer = "default";
+						dbl x = 0.0;
+						dbl y = 0.0;
+						dbl z = 0.0;
+					};
+					class line
+					{
+					public:
+						str layer = "default";
+						dbl thickness = 0;
+						num color = color_by_layer;
 						dbl x1 = 0.0;
 						dbl y1 = 0.0;
 						dbl z1 = 0.0;
-
 						dbl x2 = 0.0;
 						dbl y2 = 0.0;
 						dbl z2 = 0.0;
 					};
 					vector<point> points;
 					vector<line> lines;
-				} entities;
-			public:
+				};
+
 				cad();
 				~cad();
+
+				header header;
+				tables tables;
+				blocks blocks;
+				entities entities;
+
 
 				bool save(const string &filename);
 				bool open(const string &filename);
 			};
 		}
-		namespace Autocad2000 {}
+		namespace Autocad_2000
+		{
+		}
 	}
 }
 #endif // cadstream_h
 
-
-/* * * * * * * * * * * * * * * * * *
- * Group Code types
- * * * * * * * * * * * * * * * * * *
- * [0   , 9   ] - string
- * [10  , 59  ] - double
- * [60  , 79  ] - int
- * [140 , 147 ] - double
- * [170 , 175 ] - int
- * [210 , 239 ] - double
- * [999 , 999 ] - string
- * [1000, 1009] - double
- * [1010, 1059] - int
- * [1060, 1079] - string
- * * * * * * * * * * * * * * * * * *
- * Constants
- * * * * * * * * * * * * * * * * * *
- * Pi float:  3.141592654f
- * Pi double: 3.141592653589793238
- * * * * * * * * * * * * * * * * * */

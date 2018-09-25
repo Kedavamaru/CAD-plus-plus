@@ -12,11 +12,24 @@ If you want to representate your model using de AutoCAD DXF format, in its revis
 
     cadpp::dxf::r12::cad my_cad_model;
 
-At this point, you are ready to start adding any information that can be represented in the DXF R12 format, like layers, line styles, lines, points, circles, arcs, solids, texts, dimensions, etc and its attributes.
+At this point, you are ready to start adding any information that can be represented in the DXF R12 format, like layers, line styles, lines, points, circles, arcs, solids, texts, dimensions, etc and its attributes. The following is an example of how to add a point to your model:
 
-Once you are ready, just write it to a file:
+    // Create a circle
+	cad::entities::circle circle1;
+		circle1.layer = "MyLayer1";                  // On layer 'MyLayer1'
+		circle1.ltype = "BYLAYER";                   // With line type defined 'by layer'
+		circle1.color = constants::color::red;       // With red color
+		circle1.xc = 3.96;                           // With given center coordinates
+		circle1.yc = 5.25;
+		circle1.zc = -2.3;
+		circle1.r = 10.1;                            // And given radious
 
-    my_cad_model.save();
+    // Remember to add it to the list container for circles
+	my_cad_model.entities.circles.push_back(circle1);
+
+Once you've added everything, just write it to a file!:
+
+    my_cad_model.save("my_cad_model_file.dxf");
     
 To see an example please read "example_of_use.cpp" (https://github.com/Kedavamaru/CAD-plus-plus/blob/master/example%20of%20use.cpp)
 

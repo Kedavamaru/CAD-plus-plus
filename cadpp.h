@@ -24,7 +24,8 @@
 
 #include <fstream>
 #include <string>
-#include <vector>
+#include <list>
+#include <cmath>
 
 namespace cadpp
 {
@@ -33,25 +34,34 @@ namespace cadpp
 		namespace r12
 		{
 			using std::string;
-			using std::vector;
+			using std::list;
 			using std::ofstream;
 
-			using num = long;
-			using dbl = double;
+			using num = long long int;
+			using dbl = long double;
 			using str = string;
 
-			// AutoCAD Index Colors (ACI)
-			constexpr num color_red      =   1;
-			constexpr num color_yellow   =   2;
-			constexpr num color_green    =   3;
-			constexpr num color_cyan     =   4;
-			constexpr num color_blue     =   5;
-			constexpr num color_pink     =   6;
-			constexpr num color_default  =   7;
-				// index 7 = black @ background_color white
-				// index 7 = white @ background_color black
-			constexpr num color_by_block =   0;
-			constexpr num color_by_layer = 256;
+			namespace constants
+			{
+				// PI constant:
+				//	float       f = std::acos(-1.0f);
+				//	double      d = std::acos(-1.0 );
+				//	long double l = std::acos(-1.0l);
+
+				namespace color
+				{
+					// AutoCAD Color Index  (ACI)
+					constexpr num red      =   1;
+					constexpr num yellow   =   2;
+					constexpr num green    =   3;
+					constexpr num cyan     =   4;
+					constexpr num blue     =   5;
+					constexpr num pink     =   6;
+					constexpr num mono     =   7; // Index 7 = (background_color != white)? white : black;
+					constexpr num by_block =   0;
+					constexpr num by_layer = 256;
+				}
+			}
 
 			class cad
 			{
@@ -82,8 +92,8 @@ namespace cadpp
 					};
 
 					insbase insbase;
-					extmin extmin;
-					extmax extmax;
+					extmin  extmin ;
+					extmax  extmax ;
 				};
 				class tables
 				{
@@ -91,33 +101,74 @@ namespace cadpp
 					class ltype
 					{
 					public:
-						str name = "continuous";
-						str description = "";
+						str name  = "continuous";
+						str dscrp = "";
 						num flags = 0;
-						vector<dbl> dash_lengths;
 
-						dbl total_dash_lengths() {
-							dbl sum = 0;
-							for (auto val : dash_lengths) sum += (val > 0)? val : -1.0 * val;
-							return sum;
-						}
+						list<dbl> dashl;
 					};
 					class layer
 					{
 					public:
-						str name = "default";
+						str name  = "default";
 						num flags = 0;
-						num color = color_default;
+						num color = constants::color::mono;
 						str ltype = "continuous";
 					};
 					class style
 					{
 					public:
 					};
+					class dimstyle
+					{
+					public:
+						/*str name = "default";
+						num flags = 0;
+						str dimpost = "";
+						str dimapost = "";
+						str dimblk = "";
+						str dimblk1 = "";
+						str dimblk2 = "";
+						num dimscale = 0;
+						num dimasz = 0;
+						num dimexo = 0;
+						num dimdli = 0;
+						num dimexe = 0;
+						num dimmd = 0;
+						num dimdle = 0;
+						num dimtp = 0;
+						num dimtm = 0;
+						dbl dimtxt = 0;
+						dbl dimcen = 0;
+						dbl dimtsz = 0;
+						dbl dimaltf = 0;
+						dbl dimifac = 0;
+						dbl dimtvp = 0;
+						dbl dimtfac = 0;
+						dbl dimgap = 0;
+						num dimtol = 0;
+						num dimlim = 0;
+						num dimtih = 0;
+						num dimtoh = 0;
+						num dimsel = 0;
+						num dimse2 = 0;
+						num dimtad = 0;
+						num dimzin = 0;
+						num dimalt = 0;
+						num dimaltd = 0;
+						num dimtofl = 0;
+						num dimsah = 0;
+						num dimtix = 0;
+						num dimsoxd = 0;
+						num dimcird = 0;
+						num dimcire = 0;
+						num dimclrt = 0;*/
+					};
 
-					vector<style> styles;
-					vector<ltype> ltypes = { ltype() };
-					vector<layer> layers = { layer() };
+					list<ltype>    ltypes    = { ltype()    };
+					list<layer>    layers    = { layer()    };
+					list<style>    styles    = {};
+					list<dimstyle> dimstyles = {};
 				};
 				class blocks
 				{
@@ -130,25 +181,99 @@ namespace cadpp
 					{
 					public:
 						str layer = "default";
-						dbl x = 0.0;
-						dbl y = 0.0;
-						dbl z = 0.0;
+						dbl x     = 0.0;
+						dbl y     = 0.0;
+						dbl z     = 0.0;
 					};
 					class line
 					{
 					public:
 						str layer = "default";
-						dbl thickness = 0;
-						num color = color_by_layer;
+						str ltype = "BYLAYER";
+						num color = constants::color::by_layer;
+						dbl xi    = 0.0;
+						dbl yi    = 0.0;
+						dbl zi    = 0.0;
+						dbl xf    = 0.0;
+						dbl yf    = 0.0;
+						dbl zf    = 0.0;
+					};
+					class circle
+					{
+					public:
+						str layer = "default";
+						str ltype = "BYLAYER";
+						num color = constants::color::by_layer;
+						dbl xc    = 0.0;
+						dbl yc    = 0.0;
+						dbl zc    = 0.0;
+						dbl r     = 0.0;
+					};
+					class arc
+					{
+					public:
+						str layer = "default";
+						str ltype = "BYLAYER";
+						num color = constants::color::by_layer;
+						dbl xc    = 0.0;
+						dbl yc    = 0.0;
+						dbl zc    = 0.0;
+						dbl r = 0.0;
+						dbl angli = 0.0;
+						dbl anglf = 0.0;
+					};
+					class solid
+					{
+					public:
+						str layer = "default";
+						str ltype = "BYLAYER";
+						num color = constants::color::by_layer;
 						dbl x1 = 0.0;
 						dbl y1 = 0.0;
 						dbl z1 = 0.0;
 						dbl x2 = 0.0;
 						dbl y2 = 0.0;
 						dbl z2 = 0.0;
+						dbl x3 = 0.0;
+						dbl y3 = 0.0;
+						dbl z3 = 0.0;
+						dbl x4 = 0.0;
+						dbl y4 = 0.0;
+						dbl z4 = 0.0;
 					};
-					vector<point> points;
-					vector<line> lines;
+					class text
+					{
+					public:
+						str layer = "default";
+						str ltype = "BYLAYER";
+						num color = constants::color::by_layer;
+						dbl ix    = 0.0;
+						dbl iy    = 0.0;
+						dbl iz    = 0.0;
+						dbl h     = 1.0;
+						str textv  = "";
+						dbl rotat = 0.0;
+						dbl incln = 0.0;
+						str style = "default";
+						num flags = 0;
+						num jstfh = 1;
+						num jstfv = 2;
+						dbl ax    = 0.0;
+						dbl ay    = 0.0;
+						dbl az    = 0.0;
+					};
+					class dimension
+					{
+					public:
+					};
+
+					list<arc>       arcs;
+					list<line>      lines;
+					list<text>      texts;
+					list<point>     points;
+					list<solid>     solids;
+					list<circle>    circles;
+					list<dimension> dimensions;
 				};
 
 				cad();
@@ -159,13 +284,9 @@ namespace cadpp
 				blocks blocks;
 				entities entities;
 
-
 				bool save(const string &filename);
 				bool open(const string &filename);
 			};
-		}
-		namespace Autocad_2000
-		{
 		}
 	}
 }

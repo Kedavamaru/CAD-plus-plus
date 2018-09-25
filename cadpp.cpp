@@ -27,6 +27,11 @@ namespace cadpp
 	{
 		namespace r12
 		{
+			// Write a group code value to a file
+			void cv(int code, num value, ofstream &file) { file << code << "\n" << value << "\n"; }
+			void cv(int code, dbl value, ofstream &file) { file << code << "\n" << value << "\n"; }
+			void cv(int code, str value, ofstream &file) { file << code << "\n" << value << "\n"; }
+
 			cad::cad() {}
 			cad::~cad() {}
 
@@ -36,100 +41,189 @@ namespace cadpp
 
 				if (!file.good()) return false;
 
-				#define w(c, v) file << c << "\n" << v << "\n";
-				w(0, "SECTION")
-					w(2, "HEADER")
-						w(9, "$ACADVER")
-							w(1, "AC1009")
-						w(9, "$INSBASE")
-							w(10, header.insbase.x)
-							w(20, header.insbase.y)
-							w(30, header.insbase.z)
-						w(9, "$EXTMIN")
-							w(10, header.extmin.x)
-							w(20, header.extmin.y)
-							w(30, header.extmin.z)
-						w(9, "$EXTMAX")
-							w(10, header.extmax.x)
-							w(20, header.extmax.y)
-							w(30, header.extmax.z)
-				w(0, "ENDSEC")
-
-				w(0, "SECTION")
-					w(2, "TABLES")
-						w(0, "TABLE")
-							w(2, "LTYPE")
-							w(70, tables.ltypes.size())
-								for (auto ltype : tables.ltypes)
-								{
-									w(0, "LTYPE")
-										w(2, ltype.name)
-										w(70, ltype.flags)
-										w(3, ltype.description)
-										w(72, "65")
-										w(73, ltype.dash_lengths.size())
-										w(40, ltype.total_dash_lengths())
-										for (auto dashs_length : ltype.dash_lengths)
-										{
-											w(49, dashs_length)
-										}
-								}
-						w(0, "ENDTAB")
-						w(0, "TABLE")
-							w(2, "LAYER")
-							w(70, tables.layers.size())
-								for (auto layer : tables.layers)
-								{
-									w(0, "LAYER")
-										w(2, layer.name)
-										w(70, layer.flags)
-										w(62, layer.color)
-										w(6, layer.ltype)
-								}
-						w(0, "ENDTAB")
-						w(0, "TABLE")
-							w(2, "STYLE")
-							w(70, tables.styles.size())
-								for (auto style : tables.styles)
-								{
-									w(0, "STYLE")
-								}
-						w(0, "ENDTAB")
-				w(0, "ENDSEC")
-
-				w(0, "SECTION")
-					w(2, "BLOCKS")
-				w(0, "ENDSEC")
-
-				w(0, "SECTION")
-					w(2, "ENTITIES")
-					for (unsigned int i = 0; i < entities.points.size(); ++i)
-					{
-						w(0, "POINT")
-							w(8, entities.points[i].layer)
-							w(10, entities.points[i].x)
-							w(20, entities.points[i].y)
-							w(30, entities.points[i].z)
+				cv(0, "SECTION", file); {
+					cv(2, "HEADER", file); {
+						cv(9, "$ACADVER", file); {
+							cv(1, "AC1009", file);
+						}
+						cv(9, "$INSBASE", file); {
+							cv(10, header.insbase.x, file);
+							cv(20, header.insbase.y, file);
+							cv(30, header.insbase.z, file);
+						}
+						cv(9, "$EXTMIN", file); {
+							cv(10, header.extmin.x, file);
+							cv(20, header.extmin.y, file);
+							cv(30, header.extmin.z, file);
+						}
+						cv(9, "$EXTMAX", file); {
+							cv(10, header.extmax.x, file);
+							cv(20, header.extmax.y, file);
+							cv(30, header.extmax.z, file);
+						}
 					}
-					for (auto line : entities.lines)
-					{
-						w(0, "LINE")
-							w(8, line.layer)
-							w(39, line.thickness)
-							w(62, line.color)
-							w(10, line.x1)
-							w(20, line.y1)
-							w(30, line.z1)
-							w(11, line.x2)
-							w(21, line.y2)
-							w(31, line.z2)
+					cv(0, "ENDSEC", file);
+				}
+				cv(0, "SECTION", file); {
+					cv(2, "TABLES", file); {
+						cv(0, "TABLE", file); {
+							cv(2, "LTYPE", file);
+							cv(70, (num)tables.ltypes.size(), file);
+							for (auto ltype : tables.ltypes)
+							{
+								cv(0, "LTYPE", file); {
+									cv(2, ltype.name, file);
+									cv(70, ltype.flags, file);
+									cv(3, ltype.dscrp, file);
+									cv(72, "65", file);
+									cv(73, (num)ltype.dashl.size(), file);
+									dbl tdshl = 0.0;
+									for (auto dl : ltype.dashl)
+									{
+										tdshl = (dl > 0) ? tdshl + dl : tdshl - dl;
+									}
+									cv(40, tdshl, file);
+									for (auto dl : ltype.dashl)
+									{
+										cv(49, dl, file);
+									}
+								}
+							}
+							cv(0, "ENDTAB", file);
+						}
+						cv(0, "TABLE", file); {
+							cv(2, "LAYER", file);
+							cv(70, (num)tables.layers.size(), file);
+							for (auto layer : tables.layers)
+							{
+								cv(0, "LAYER", file); {
+									cv(2, layer.name, file);
+									cv(70, layer.flags, file);
+									cv(62, layer.color, file);
+									cv(6, layer.ltype, file);
+								}
+							}
+							cv(0, "ENDTAB", file);
+						}
+						cv(0, "TABLE", file); {
+							cv(2, "STYLE", file);
+							cv(70, (num)tables.styles.size(), file);
+							for (auto style : tables.styles)
+							{
+								cv(0, "STYLE", file);
+								{
+								}
+							}
+							cv(0, "ENDTAB", file);
+						}
 					}
-				w(0, "ENDSEC")
-
-				w(0, "EOF")
-				#undef w
+					cv(0, "ENDSEC", file);
+				}
+				cv(0, "SECTION", file); {
+					cv(2, "BLOCKS", file); {
+					}
+					cv(0, "ENDSEC", file);
+				}
+				cv(0, "SECTION", file); {
+					cv(2, "ENTITIES", file); {
+						for (auto point : entities.points)
+						{
+							cv(0, "POINT", file); {
+								cv(8, point.layer, file);
+								cv(10, point.x, file);
+								cv(20, point.y, file);
+								cv(30, point.z, file);
+							}
+						}
+						for (auto line : entities.lines)
+						{
+							cv(0, "LINE", file); {
+								cv(8, line.layer, file);
+								cv(6, line.ltype, file);
+								cv(62, line.color, file);
+								cv(10, line.xi, file);
+								cv(20, line.yi, file);
+								cv(30, line.zi, file);
+								cv(11, line.xf, file);
+								cv(21, line.yf, file);
+								cv(31, line.zf, file);
+							}
+						}
+						for (auto circle : entities.circles)
+						{
+							cv(0, "CIRCLE", file); {
+								cv(8, circle.layer, file);
+								cv(6, circle.ltype, file);
+								cv(62, circle.color, file);
+								cv(10, circle.xc, file);
+								cv(20, circle.yc, file);
+								cv(30, circle.zc, file);
+								cv(40, circle.r, file);
+							}
+						}
+						for (auto arc : entities.arcs)
+						{
+							cv(0, "ARC", file); {
+								cv(8, arc.layer, file);
+								cv(6, arc.ltype, file);
+								cv(62, arc.color, file);
+								cv(10, arc.xc, file);
+								cv(20, arc.yc, file);
+								cv(30, arc.zc, file);
+								cv(40, arc.r, file);
+								cv(50, arc.angli, file);
+								cv(51, arc.anglf, file);
+							}
+						}
+						for (auto solid : entities.solids)
+						{
+							cv(0, "SOLID", file); {
+								cv(8, solid.layer, file);
+								cv(6, solid.ltype, file);
+								cv(62, solid.color, file);
+								cv(10, solid.x1, file);
+								cv(20, solid.y1, file);
+								cv(30, solid.z1, file);
+								cv(11, solid.x2, file);
+								cv(21, solid.y2, file);
+								cv(31, solid.z2, file);
+								cv(12, solid.x3, file);
+								cv(22, solid.y3, file);
+								cv(32, solid.z3, file);
+								cv(13, solid.x4, file);
+								cv(23, solid.y4, file);
+								cv(33, solid.z4, file);
+							}
+						}
+						for (auto text : entities.texts)
+						{
+							cv(0, "TEXT", file); {
+								cv(8, text.layer, file);
+								cv(6, text.ltype, file);
+								cv(62, text.color, file);
+								cv(10, text.ix, file);
+								cv(20, text.iy, file);
+								cv(30, text.iz, file);
+								cv(40, text.h, file);
+								cv(1, text.textv, file);
+								cv(50, text.rotat, file);
+								cv(51, text.incln, file);
+								cv(7, text.style, file);
+								cv(71, text.flags, file);
+								cv(72, text.jstfh, file);
+								cv(73, text.jstfv, file);
+								cv(11, text.ax, file);
+								cv(21, text.ay, file);
+								cv(31, text.az, file);
+							}
+						}
+					}
+					cv(0, "ENDSEC", file);
+				}
+				cv(0, "EOF", file);
 
 				file.close();
+
 				return file.good();
 			}
 			bool cad::open(const string &filename)

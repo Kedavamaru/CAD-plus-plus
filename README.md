@@ -22,6 +22,10 @@ Currently the library contains facilities for:
 - Autocad DXF R12 especification
   - Points
   - Lines
+  - Circles
+  - Arcs
+  - Texts
+  - Solids
   
 # Future work
 More features will be added soon, the order of priority will be:

@@ -112,6 +112,17 @@ namespace cadpp
 							{
 								cv(0, "STYLE", file);
 								{
+									cv(2, style.name, file);
+									num flags = 4 * style.vrtcl;
+									cv(70, flags, file);
+									cv(40, style.h, file);
+									cv(41, style.wdthf, file);
+									cv(50, style.incln, file);
+									num gflgs = style.mirry * 4 + style.mirrx * 2;
+									cv(71, gflgs, file);
+									cv(42, "1", file);
+									cv(3, style.nfont, file);
+									cv(4, style.bfont, file);
 								}
 							}
 							cv(0, "ENDTAB", file);
@@ -198,18 +209,38 @@ namespace cadpp
 						for (auto text : entities.texts)
 						{
 							cv(0, "TEXT", file); {
+								num gflgs;
+
 								cv(8, text.layer, file);
 								cv(6, text.ltype, file);
 								cv(62, text.color, file);
 								cv(10, text.ix, file);
 								cv(20, text.iy, file);
 								cv(30, text.iz, file);
-								cv(40, text.h, file);
-								cv(1, text.textv, file);
+								if (text.override_style)
+								{
+									cv(40, text.h, file);
+								}
+								else
+								{
+									cv(40, text.style.h, file);
+								}
+								cv(1, text.cntnt, file);
 								cv(50, text.rotat, file);
-								cv(51, text.incln, file);
-								cv(7, text.style, file);
-								cv(71, text.flags, file);
+								if (text.override_style)
+								{
+									cv(41, text.wdthf, file);
+									cv(51, text.incln, file);
+									gflgs = text.mirry * 4 + text.mirrx * 2;
+								}
+								else
+								{
+									cv(41, text.style.wdthf, file);
+									cv(51, text.style.incln, file);
+									gflgs = text.style.mirry * 4 + text.style.mirrx * 2;
+								}
+								cv(7, text.style.name, file);
+								cv(71, gflgs, file);
 								cv(72, text.jstfh, file);
 								cv(73, text.jstfv, file);
 								cv(11, text.ax, file);

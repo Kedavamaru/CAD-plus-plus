@@ -40,6 +40,7 @@ namespace cadpp
 			using num = long long int;
 			using dbl = long double;
 			using str = string;
+			using bit = bool;
 
 			namespace constants
 			{
@@ -60,6 +61,34 @@ namespace cadpp
 					constexpr num mono     =   7; // Index 7 = (background_color != white)? white : black;
 					constexpr num by_block =   0;
 					constexpr num by_layer = 256;
+				}
+				namespace text_jstf
+				{
+					namespace h
+					{
+						// This three can be combined with any text_jstf::v::
+						constexpr num left    = 0;
+						constexpr num center  = 1;
+						constexpr num right   = 2;
+
+						// This three can only be combined with text_jstf::v::baseline
+						constexpr num aligned = 3;
+						constexpr num middle  = 4;
+						constexpr num fit     = 5;
+					}
+					namespace v
+					{
+						constexpr num baseline = 0;
+						constexpr num bottom   = 1;
+						constexpr num middle   = 2;
+						constexpr num top      = 3;
+					}
+					namespace g
+					{
+						constexpr num vertical = 4;
+						constexpr num backward = 2;
+						constexpr num upside_down = 4;
+					}
 				}
 			}
 
@@ -118,6 +147,15 @@ namespace cadpp
 					class style
 					{
 					public:
+						str name = "default";
+						bit vrtcl = false;
+						bit mirrx = false;
+						bit mirry = false;
+						dbl h     = 1.0;
+						dbl wdthf = 1.0;
+						dbl incln = 0.0;
+						str nfont = "Courier New";
+						str bfont = "";
 					};
 					class dimstyle
 					{
@@ -167,8 +205,8 @@ namespace cadpp
 
 					list<ltype>    ltypes    = { ltype()    };
 					list<layer>    layers    = { layer()    };
-					list<style>    styles    = {};
-					list<dimstyle> dimstyles = {};
+					list<style>    styles    = {            };
+					list<dimstyle> dimstyles = {            };
 				};
 				class blocks
 				{
@@ -250,17 +288,23 @@ namespace cadpp
 						dbl ix    = 0.0;
 						dbl iy    = 0.0;
 						dbl iz    = 0.0;
-						dbl h     = 1.0;
-						str textv  = "";
-						dbl rotat = 0.0;
-						dbl incln = 0.0;
-						str style = "default";
-						num flags = 0;
-						num jstfh = 1;
-						num jstfv = 2;
 						dbl ax    = 0.0;
 						dbl ay    = 0.0;
 						dbl az    = 0.0;
+						str cntnt = "";
+						dbl rotat = 0.0;
+						num jstfh = constants::text_jstf::h::center;
+						num jstfv = constants::text_jstf::v::middle;
+
+						tables::style style;
+						bit override_style = false;
+						// if (override_style) use the following vars
+						// else use the vars in the style
+						dbl h     = 1.0;
+						dbl incln = 0.0;
+						dbl wdthf = 1.0;
+						bit mirrx = false;
+						bit mirry = false;
 					};
 					class dimension
 					{

@@ -1,5 +1,5 @@
 # CAD++
-CAD plus plus is an includable code, (cadpp.h and cadpp.cpp), where namespaces and classes are provided in order to facilitate the managing of CAD files in different formats.
+CAD plus plus is a library, (cadpp.h and cadpp.cpp), where namespaces and classes are provided in order to facilitate the managing of CAD files in different formats.
 
 # Example
 CAD++ is organized in the following way:
